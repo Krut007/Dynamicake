@@ -7,7 +7,7 @@ import {Constants} from "@pancakeswap/v4-core/test/pool-cl/helpers/Constants.sol
 import {Currency} from "@pancakeswap/v4-core/src/types/Currency.sol";
 import {PoolKey} from "@pancakeswap/v4-core/src/types/PoolKey.sol";
 import {CLPoolParametersHelper} from "@pancakeswap/v4-core/src/pool-cl/libraries/CLPoolParametersHelper.sol";
-import {CLCounterHook} from "../../src/pool-cl/CLCounterHook.sol";
+import {CLCounterHook} from "../../src/CLCounterHook.sol";
 import {CLTestUtils} from "./utils/CLTestUtils.sol";
 import {CLPoolParametersHelper} from "@pancakeswap/v4-core/src/pool-cl/libraries/CLPoolParametersHelper.sol";
 import {PoolIdLibrary} from "@pancakeswap/v4-core/src/types/PoolId.sol";

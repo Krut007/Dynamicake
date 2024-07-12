@@ -6,7 +6,7 @@ import {BalanceDelta, BalanceDeltaLibrary} from "@pancakeswap/v4-core/src/types/
 import {BeforeSwapDelta, BeforeSwapDeltaLibrary} from "@pancakeswap/v4-core/src/types/BeforeSwapDelta.sol";
 import {PoolId, PoolIdLibrary} from "@pancakeswap/v4-core/src/types/PoolId.sol";
 import {ICLPoolManager} from "@pancakeswap/v4-core/src/pool-cl/interfaces/ICLPoolManager.sol";
-import {CLBaseHook} from "./CLBaseHook.sol";
+import {CLBaseHook} from "./pool-cl/CLBaseHook.sol";
 
 /// @notice CLCounterHook is a contract that counts the number of times a hook is called
 /// @dev note the code is not production ready, it is only to share how a hook looks like

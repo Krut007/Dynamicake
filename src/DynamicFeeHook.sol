@@ -11,9 +11,14 @@ import {CLBaseHook} from "./pool-cl/CLBaseHook.sol";
 
 /// @notice CLCounterHook is a contract that counts the number of times a hook is called
 /// @dev note the code is not production ready, it is only to share how a hook looks like
-contract CLCounterHook is CLBaseHook {
+contract DynamicFeeHook is CLBaseHook {
     using PoolIdLibrary for PoolKey;
 
+
+    struct param {
+        uint24 baseFactor;
+        uint binStep;
+    }
     
 
     mapping(PoolId => uint24 fee) public poolBaseFactor;
@@ -48,20 +53,17 @@ contract CLCounterHook is CLBaseHook {
         );
     }
 
-    function afterInitialize(address, PoolKey calldata key, uint160, int24, bytes calldata poolData)
+    function afterInitialize(address, PoolKey calldata key, uint160, int24, bytes calldata swapRawData)
         external
         override 
         returns (bytes4)
     {
+        param memory swapData = abi.decode(swapRawData, (param));
+
         //TODO implement
         poolVolatility[key.toId()] = 1;
-        poolBinStep[key.toId()] = 5;
-
-
-
-
-        uint24 swapFee = abi.decode(poolData, (uint24));
-        poolBaseFactor[key.toId()] = swapFee;
+        poolBinStep[key.toId()] = swapData.binStep;
+        poolBaseFactor[key.toId()] = swapData.baseFactor;
 
         return this.afterInitialize.selector;
     }

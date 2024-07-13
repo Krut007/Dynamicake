@@ -57,7 +57,11 @@ contract DynamicFeeHookTest is Test, CLTestUtils {
 
         DynamicFeeHook.param memory paramAlice = DynamicFeeHook.param({
             baseFactor: 10,
-            binStep: 5
+            binStep: 5,
+            constantA: 1,
+            constantR: 1,
+            filterPeriod: 1,
+            decayPeriod: 2
         });
  
         // initialize pool at 1:1 price point and set 3000 as initial lp fee, lpFee is stored in the hook
@@ -73,8 +77,11 @@ contract DynamicFeeHookTest is Test, CLTestUtils {
  
         DynamicFeeHook.param memory paramBob = DynamicFeeHook.param({
             baseFactor: 10,
-            binStep: 5
-
+            binStep: 5,
+            constantA: 1,
+            constantR: 1,
+            filterPeriod: 1,
+            decayPeriod: 2
         });
         // initialize pool at 1:1 price point and set 3000 as initial lp fee, lpFee is stored in the hook
         poolManager.initialize(bobKey, Constants.SQRT_RATIO_1_1, abi.encode(paramBob));
@@ -113,11 +120,10 @@ contract DynamicFeeHookTest is Test, CLTestUtils {
         uint256 amtOutBob = _swapBob();
         console2.log(amtOutBob);
         
- 
         // amt out be at least 0.3% lesser due to swap fee
         assertLe(amtOutBob, amtOutAlice);
     }
- 
+
     function _swapAlice() internal returns (uint256 amtOut) {
         // set alice as tx.origin
         vm.prank(address(alice), address(alice));

@@ -7,7 +7,7 @@ import {Constants} from "@pancakeswap/v4-core/test/pool-cl/helpers/Constants.sol
 import {Currency} from "@pancakeswap/v4-core/src/types/Currency.sol";
 import {PoolKey} from "@pancakeswap/v4-core/src/types/PoolKey.sol";
 import {CLPoolParametersHelper} from "@pancakeswap/v4-core/src/pool-cl/libraries/CLPoolParametersHelper.sol";
-import {CLCounterHook} from "../../src/CLCounterHook.sol";
+import {CLCounterHook} from "../src/CLCounterHook.sol";
 import {CLTestUtils} from "./utils/CLTestUtils.sol";
 import {CLPoolParametersHelper} from "@pancakeswap/v4-core/src/pool-cl/libraries/CLPoolParametersHelper.sol";
 import {PoolIdLibrary} from "@pancakeswap/v4-core/src/types/PoolId.sol";
@@ -36,7 +36,6 @@ contract CLCounterHookTest is Test, CLTestUtils {
             // tickSpacing: 10
             parameters: bytes32(uint256(hook.getHooksRegistrationBitmap())).setTickSpacing(10)
         });
-
         // initialize pool at 1:1 price point (assume stablecoin pair)
         poolManager.initialize(key, Constants.SQRT_RATIO_1_1, new bytes(0));
     }

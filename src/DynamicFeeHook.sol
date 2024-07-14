@@ -75,9 +75,9 @@ contract DynamicFeeHook is CLBaseHook {
     {
         param memory swapData = abi.decode(swapRawData, (param));
 
-        //TODO implement
-        poolConstantA[key.toId()] = 1;
-        poolVolatilityAccumulator[key.toId()] = 1;
+
+        poolVolatilityReference[key.toId()] = 0;
+        poolVolatilityAccumulator[key.toId()] = 0;
 
 
 
@@ -111,14 +111,7 @@ contract DynamicFeeHook is CLBaseHook {
         uint24 baseFee = baseFee(key.toId());
         uint24 dynamicFee = dynamicFee(key.toId(), deltaTime, k);
 
-
-
-    
-        
-
         uint24 lpFee = (baseFee);
-
-
         return (this.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, lpFee | LPFeeLibrary.OVERRIDE_FEE_FLAG);
     }
 

@@ -11,6 +11,8 @@ import {CLBaseHook} from "./pool-cl/CLBaseHook.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {SignedMath} from "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import { SD59x18 } from "@prb/math/src/SD59x18.sol";
+import { UD60x18, convert, wrap, div, floor} from "@prb/math/src/UD60x18.sol";
 
 /// @notice CLCounterHook is a contract that counts the number of times a hook is called
 /// @dev note the code is not production ready, it is only to share how a hook looks like
@@ -32,8 +34,8 @@ contract DynamicFeeHook is CLBaseHook {
     mapping(PoolId => uint24 volatility) public poolVolatilityAccumulator;
     mapping(PoolId => uint24 binStep) public poolBinStep;
     mapping(PoolId => uint24 currentBin) public poolCurrentBin;
-    mapping(PoolId => uint24 filterPeriod) public poolFilterPeriod;
-    mapping(PoolId => uint24 decayPeriod) public poolDecayPeriod;
+    mapping(PoolId => uint256 filterPeriod) public poolFilterPeriod;
+    mapping(PoolId => uint256 decayPeriod) public poolDecayPeriod;
     mapping(PoolId => uint256 lastSwapTime) public poolLastSwap;
     mapping(PoolId => uint24 indexReference) public poolIndexReference;
     mapping(PoolId => uint24 volatilityReference) public poolVolatilityReference;
@@ -97,14 +99,24 @@ contract DynamicFeeHook is CLBaseHook {
         poolManagerOnly
         returns (bytes4, BeforeSwapDelta, uint24)
     {
-        uint24 baseFee = baseFee(key.toId());
-        uint24 dynamicFee = dynamicFee(key.toId());
 
         uint deltaTime = block.timestamp - poolLastSwap[key.toId()];
-
         poolLastSwap[key.toId()] = block.timestamp;
 
-        uint24 lpFee = baseFee+dynamicFee;
+
+        //TODO
+        //Number of tick the swap is spanning across
+        int256 k = 2;
+
+        uint24 baseFee = baseFee(key.toId());
+        uint24 dynamicFee = dynamicFee(key.toId(), deltaTime, k);
+
+
+
+    
+        
+
+        uint24 lpFee = (baseFee);
 
 
         return (this.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, lpFee | LPFeeLibrary.OVERRIDE_FEE_FLAG);
@@ -112,13 +124,13 @@ contract DynamicFeeHook is CLBaseHook {
 
     //Good
     function baseFee(PoolId id) internal returns (uint24){
-        return (poolBaseFactor[id] * poolBinStep[id])/(2**6);
+        return (poolBaseFactor[id] * poolBinStep[id])/(10**6);
     }
 
-    function dynamicFee(PoolId id) internal returns (uint24){
-        return uint24(poolConstantA[id]*((poolVolatilityAccumulator[id]+poolBinStep[id])**2));
+    //Good
+    function dynamicFee(PoolId id, uint256 time, int256 k) internal returns (uint24){
+        return uint24((poolConstantA[id]*(((volatilityAccumulator(id, k, time)+poolBinStep[id])**2)/(10**6)))/(10**6));
     }
-
 
     //Good
     function indexReference(uint256 time, PoolId id) internal returns(uint24){
@@ -133,18 +145,28 @@ contract DynamicFeeHook is CLBaseHook {
         if (time>=poolDecayPeriod[id]){
             poolVolatilityReference[id] = 0;
         } else if (time>=poolFilterPeriod[id]){
-            poolVolatilityReference[id] = (poolConstantR[id] * poolVolatilityAccumulator[id])/2**6;
+            poolVolatilityReference[id] = (poolConstantR[id] * poolVolatilityAccumulator[id])/(10**6);
         }
         return poolVolatilityReference[id];
     }
 
-    function volatilityAccumulator(PoolId id, int k, uint256 time) internal returns(uint24){
+    //Good
+    function volatilityAccumulator(PoolId id, int256 k, uint256 time) internal returns(uint24){
         poolVolatilityAccumulator[id] = volatilityReference(time, id)+uint24(SignedMath.abs(SafeCast.toInt256(indexReference(time, id))-(SafeCast.toInt256(poolCurrentBin[id])+k)));
         return poolVolatilityAccumulator[id];
     }
 
-    function getIdFromPrice(uint price, PoolId id) internal returns(uint) {
-        //uint256 logPrice = Math.log2(price);
-        //uint256 logStep = Math.log2((1<<128) + poolBinStep[id]<<123);
+    //Good
+    /*
+    function getIdFromRatio(uint256 unsignedRatio, PoolId id) internal returns(uint256) {
+        UD60x18 ratio = convert(unsignedRatio);
+        UD60x18 price = div(ratio,convert(uint256()));
+        UD60x18 logPrice = price.log2();
+        UD60x18 logStep = wrap(uint256(1*(10**18)+1*(10**12))).log2();
+        UD60x18 divResult = div(logPrice, logStep);
+        UD60x18 tronc = floor(divResult);
+        uint256 unsignedTronc = convert(tronc);
+        return unsignedTronc+8388608;
     }
+    */
 }

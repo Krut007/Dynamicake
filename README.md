@@ -9,4 +9,6 @@
 
 ## Description
 
-This repository contains example counter hook for both CL and Bin pool types. 
+This repo contais the code for a hook on pancakeSwapV4.
+
+ps : Not finished 

@@ -42,8 +42,6 @@ contract DynamicFeeHook is CLBaseHook {
     mapping(PoolId => uint24 constantR) public poolConstantR;
     mapping(PoolId => uint24 constantA) public poolConstantA;
     
-
-    //mapping(address => int256 volume) public userVolume;
     
     constructor(ICLPoolManager _poolManager) CLBaseHook(_poolManager) {}
 
@@ -106,6 +104,8 @@ contract DynamicFeeHook is CLBaseHook {
 
         //TODO
         //Number of tick the swap is spanning across
+        //Did not have enough time and knowledge to implement it
+        //Need to simulate the transaction
         int256 k = 2;
 
         uint24 baseFee = baseFee(key.toId());
@@ -115,17 +115,17 @@ contract DynamicFeeHook is CLBaseHook {
         return (this.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, lpFee | LPFeeLibrary.OVERRIDE_FEE_FLAG);
     }
 
-    //Good
+    //Calcul the base fee
     function baseFee(PoolId id) internal returns (uint24){
         return (poolBaseFactor[id] * poolBinStep[id])/(10**6);
     }
 
-    //Good
+    //Calcul the dynamic fee
     function dynamicFee(PoolId id, uint256 time, int256 k) internal returns (uint24){
         return uint24((poolConstantA[id]*(((volatilityAccumulator(id, k, time)+poolBinStep[id])**2)/(10**6)))/(10**6));
     }
 
-    //Good
+    //Calcul the indexReference
     function indexReference(uint256 time, PoolId id) internal returns(uint24){
         if (time>=poolFilterPeriod[id]){
             poolIndexReference[id] = poolCurrentBin[id];
@@ -133,7 +133,7 @@ contract DynamicFeeHook is CLBaseHook {
         return poolIndexReference[id];
     }
 
-    //Good
+    //Calcul the volatility reference
     function volatilityReference(uint time, PoolId id) internal returns(uint24){
         if (time>=poolDecayPeriod[id]){
             poolVolatilityReference[id] = 0;
@@ -143,13 +143,14 @@ contract DynamicFeeHook is CLBaseHook {
         return poolVolatilityReference[id];
     }
 
-    //Good
+    //Calcul the volatility accumulator
     function volatilityAccumulator(PoolId id, int256 k, uint256 time) internal returns(uint24){
         poolVolatilityAccumulator[id] = volatilityReference(time, id)+uint24(SignedMath.abs(SafeCast.toInt256(indexReference(time, id))-(SafeCast.toInt256(poolCurrentBin[id])+k)));
         return poolVolatilityAccumulator[id];
     }
 
-    //Good
+    //Was suppose to implement the Bin calcul but we change the way to do it.
+    //I let it there cause it take me a lot of time to build it.
     /*
     function getIdFromRatio(uint256 unsignedRatio, PoolId id) internal returns(uint256) {
         UD60x18 ratio = convert(unsignedRatio);

@@ -25,6 +25,7 @@ contract CounterScript is Script {
     }
 
     function run() public {
+        /*
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
         DynamicFeeHook hook = new DynamicFeeHook(0x97e09cD0E079CeeECBb799834959e3dC8e4ec31A);
@@ -46,5 +47,6 @@ contract CounterScript is Script {
         });
         0x97e09cD0E079CeeECBb799834959e3dC8e4ec31A.initialize(key, Constants.SQRT_RATIO_1_1, abi.encode(param));
         vm.stopBroadcast();
+        */
     }
 }

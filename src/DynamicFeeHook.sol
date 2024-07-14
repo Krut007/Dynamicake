@@ -19,7 +19,7 @@ import { UD60x18, convert, wrap, div, floor} from "@prb/math/src/UD60x18.sol";
 contract DynamicFeeHook is CLBaseHook {
     using PoolIdLibrary for PoolKey;
 
-
+    //Struct use to transmit parameter
     struct param {
         uint24 baseFactor;
         uint24 binStep;

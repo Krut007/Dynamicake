@@ -56,7 +56,7 @@ contract DynamicFeeHookTest is Test, CLTestUtils {
         });
 
         DynamicFeeHook.param memory paramAlice = DynamicFeeHook.param({
-            baseFactor: 10,
+            baseFactor: 5,
             binStep: 5,
             constantA: 1,
             constantR: 1,
